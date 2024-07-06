@@ -7,7 +7,7 @@ AlgoSort is a web application that demonstrates various sorting algorithms and p
 - Implements Quick Sort, Heap Sort, Merge Sort, Radix Sort, and Bucket Sort algorithms
 - RESTful API following HATEOAS principles
 - Simple web interface for sorting input
-- CRUD operations for sort results
+- CRUD operations for sort results in the SortResultResource class
 
 ## Getting Started
 
@@ -37,10 +37,39 @@ AlgoSort is a web application that demonstrates various sorting algorithms and p
 - PUT /api/sortresults/{id}: Update a sort result
 - DELETE /api/sortresults/{id}: Delete a sort result
 
-## Contributing
+## Project Structure
 
-Please read CONTRIBUTING.md for details on our code of conduct, and the process for submitting pull requests.
 
+```plaintext
+AlgoSort
+├── src
+│   └── main
+│       ├── java
+│       │   └── com.abmike.algosort
+│       │       ├── model
+│       │       │   └── SortResult.java
+│       │       ├── service
+│       │       │   └── SortingService.java
+│       │       ├── api
+│       │       │   ├── SortingResource.java
+│       │       │   └── SortResultResource.java
+│       │       ├── util
+│       │       │   └── HateoasUtil.java
+│       │       ├── algorithm
+│       │       │   ├── QuickSort.java
+│       │       │   ├── HeapSort.java
+│       │       │   ├── MergeSort.java
+│       │       │   ├── RadixSort.java
+│       │       │   └── BucketSort.java
+│       └── AlgoSortApplication.java
+│       └── webapp
+│           ├── WEB-INF
+│           │   └── web.xml
+│           ├── index.html
+│           └── styles.css
+├── pom.xml
+└── README.md
+```
 ## License
 
 This project is licensed under the MIT License - see the LICENSE.md file for details

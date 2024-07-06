@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlgoSort - Sorting Algorithm Comparator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="container">
+    <h1>AlgoSort</h1>
+    <form id="sortForm">
+        <div class="form-group">
+            <label for="numbers">Enter numbers (comma-separated):</label>
+            <input type="text" id="numbers" placeholder="12,3,15,33" name="numbers" required>
+        </div>
+        <div class="form-group">
+            <label for="algorithm">Choose sorting algorithm:</label>
+            <select id="algorithm" name="algorithm" required>
+                <option value="">Select an algorithm</option>
+                <option value="quicksort">Quick Sort</option>
+                <option value="heapsort">Heap Sort</option>
+                <option value="mergesort">Merge Sort</option>
+                <option value="radixsort">Radix Sort</option>
+                <option value="bucketsort">Bucket Sort</option>
+            </select>
+            <button type="button" id="infoButton" class="info-button">i</button>
+        </div>
+        <button type="submit">Sort</button>
+    </form>
+    <div id="result" class="hidden">
+        <h2>Sorting Result</h2>
+        <p><strong>Original Numbers:</strong> <span id="originalNumbers"></span></p>
+        <p><strong>Sorted Numbers:</strong> <span id="sortedNumbers"></span></p>
+        <p><strong>Algorithm Used:</strong> <span id="usedAlgorithm"></span></p>
+        <p><strong>Execution Time:</strong> <span id="executionTime"></span> ms</p>
+        <p class="disclaimer">("Execution time may vary based on system load and input characteristics. For more accurate comparisons, consider running multiple trials and averaging the results.")</p>
+        <p><strong>Step Count:</strong> <span id="stepCount"></span></p>
+    </div>
+    <div id="error" class="hidden">
+        <h2>Error</h2>
+        <p id="errorMessage"></p>
+    </div>
+    <div id="algorithmInfo" class="modal hidden">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2 id="algorithmTitle"></h2>
+            <p id="algorithmDescription"></p>
+            <p><strong>Time Complexity:</strong> <span id="timeComplexity"></span></p>
+            <p><strong>Space Complexity:</strong> <span id="spaceComplexity"></span></p>
+            <p><strong>Best Case Scenario:</strong> <span id="bestCase"></span></p>
+        </div>
+    </div>
+</div>
+<script>
+    const algorithmInfo = {
+        quicksort: {
+            title: "Quick Sort",
+            description: "Quick Sort is a divide-and-conquer algorithm that works by selecting a 'pivot' element from the array and partitioning the other elements into two sub-arrays, according to whether they are less than or greater than the pivot.",
+            timeComplexity: "O(n log n) on average, O(n^2) worst case",
+            spaceComplexity: "O(log n)",
+            bestCase: "Nearly sorted arrays or arrays with many duplicates"
+        },
+        heapsort: {
+            title: "Heap Sort",
+            description: "Heap Sort is a comparison-based sorting algorithm that uses a binary heap data structure. It divides its input into a sorted and an unsorted region, and iteratively shrinks the unsorted region by extracting the largest element and moving it to the sorted region.",
+            timeComplexity: "O(n log n)",
+            spaceComplexity: "O(1)",
+            bestCase: "Works well for large datasets"
+        },
+        mergesort: {
+            title: "Merge Sort",
+            description: "Merge Sort is an efficient, stable, divide-and-conquer algorithm that works by dividing the unsorted list into n sublists, each containing one element, and then repeatedly merging sublists to produce new sorted sublists until there is only one sublist remaining.",
+            timeComplexity: "O(n log n)",
+            spaceComplexity: "O(n)",
+            bestCase: "Good for linked lists and external sorting"
+        },
+        radixsort: {
+            title: "Radix Sort",
+            description: "Radix Sort is a non-comparative integer sorting algorithm that sorts data with integer keys by grouping keys by the individual digits which share the same significant position and value.",
+            timeComplexity: "O(nk) where k is the number of digits in the largest number",
+            spaceComplexity: "O(n + k)",
+            bestCase: "Integer or string data with fixed-length keys"
+        },
+        bucketsort: {
+            title: "Bucket Sort",
+            description: "Bucket Sort is a distribution sort that works by distributing the elements of an array into a number of buckets. Each bucket is then sorted individually, either using a different sorting algorithm, or by recursively applying the bucket sorting algorithm.",
+            timeComplexity: "O(n + k) where k is the number of buckets",
+            spaceComplexity: "O(n + k)",
+            bestCase: "Uniformly distributed data over a range"
+        }
+    };
+
+    document.getElementById('sortForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const numbers = document.getElementById('numbers').value;
+        const algorithm = document.getElementById('algorithm').value;
+
+        if (!numbers.trim() || !algorithm) {
+            showError('Please enter numbers and select an algorithm.');
+            return;
+        }
+
+        fetch('/AlgoSort_war_exploded/api/sort', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `numbers=${encodeURIComponent(numbers)}&algorithm=${encodeURIComponent(algorithm)}`
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw err; });
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('originalNumbers').textContent = data.originalNumbers;
+                document.getElementById('sortedNumbers').textContent = data.sortedNumbers;
+                document.getElementById('usedAlgorithm').textContent = data.algorithm;
+                document.getElementById('executionTime').textContent = data.executionTime;
+                document.getElementById('stepCount').textContent = data.stepCount;
+                document.getElementById('result').classList.remove('hidden');
+                document.getElementById('error').classList.add('hidden');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showError(error.error || 'An unexpected error occurred');
+            });
+    });
+
+    function showError(message) {
+        document.getElementById('errorMessage').textContent = message;
+        document.getElementById('error').classList.remove('hidden');
+        document.getElementById('result').classList.add('hidden');
+    }
+
+    document.getElementById('infoButton').addEventListener('click', function() {
+        const algorithm = document.getElementById('algorithm').value;
+        if (algorithm && algorithmInfo[algorithm]) {
+            const info = algorithmInfo[algorithm];
+            document.getElementById('algorithmTitle').textContent = info.title;
+            document.getElementById('algorithmDescription').textContent = info.description;
+            document.getElementById('timeComplexity').textContent = info.timeComplexity;
+            document.getElementById('spaceComplexity').textContent = info.spaceComplexity;
+            document.getElementById('bestCase').textContent = info.bestCase;
+            document.getElementById('algorithmInfo').classList.remove('hidden');
+        }
+    });
+
+    document.querySelector('.close').addEventListener('click', function() {
+        document.getElementById('algorithmInfo').classList.add('hidden');
+    });
+
+    window.onclick = function(event) {
+        if (event.target == document.getElementById('algorithmInfo')) {
+            document.getElementById('algorithmInfo').classList.add('hidden');
+        }
+    }
+</script>
+</body>
+</html>

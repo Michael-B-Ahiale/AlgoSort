@@ -58,7 +58,7 @@ public class SortingResource {
         }
     }
 
-    // You might want to add this inner class for consistent error responses
+
     private static class ErrorResponse {
         public String error;
 

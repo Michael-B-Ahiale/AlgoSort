@@ -8,7 +8,7 @@ public class RadixSort {
     public int[] sort(int[] arr) {
         stepCount = 0;
         int max = Arrays.stream(arr).max().getAsInt();
-        stepCount += arr.length; // Approximation for finding max
+        stepCount += arr.length;
 
         for (int exp = 1; max / exp > 0; exp *= 10) {
             countSort(arr, exp);
